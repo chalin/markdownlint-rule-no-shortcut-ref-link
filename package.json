@@ -1,6 +1,6 @@
 {
   "name": "markdownlint-rule-no-shortcut-ref-link",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A markdownlint rule that flags shortcut reference links and converts them to collapsed form",
   "license": "Apache-2.0",
   "author": "chalin",
