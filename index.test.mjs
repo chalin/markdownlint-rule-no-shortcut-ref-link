@@ -158,6 +158,11 @@ describe(ruleName, () => {
       assert.equal(errors.length, 0);
     });
 
+    it('does not flag footnote syntax like [^1]', () => {
+      const errors = lintContent('Some text[^1] here.\n');
+      assert.equal(errors.length, 0);
+    });
+
     it('still flags defined shortcuts when check_undefined is false', () => {
       const errors = lintContent(
         'See [defined] and [undefined] here.\n\n[defined]: https://example.com\n',
@@ -198,6 +203,55 @@ describe(ruleName, () => {
         check_undefined: false,
         ignore_pattern: '^\\d+$',
       });
+      assert.equal(errors.length, 0);
+    });
+  });
+
+  describe('embedded in identifier', () => {
+    it('skips [name] embedded in a dotted path', () => {
+      const errors = lintContent(
+        'otel.instrumentation.[name].enabled\n',
+      );
+      assert.equal(errors.length, 0);
+    });
+
+    it('flags _[foo]_ (markdown italic)', () => {
+      const errors = lintContent(
+        'Use _[foo]_ for details.\n\n[foo]: https://example.com\n',
+      );
+      assert.equal(errors.length, 1);
+    });
+
+    it('flags [name] with spaces around it', () => {
+      const errors = lintContent('where [name] is the value\n');
+      assert.equal(errors.length, 1);
+    });
+
+    it('flags **[foo]** (markdown formatting)', () => {
+      const errors = lintContent(
+        'Use **[foo]** for details.\n\n[foo]: https://example.com\n',
+      );
+      assert.equal(errors.length, 1);
+    });
+
+    it('flags [foo] at start of line', () => {
+      const errors = lintContent(
+        '[foo] is a tool.\n\n[foo]: https://example.com\n',
+      );
+      assert.equal(errors.length, 1);
+    });
+
+    it('flags [foo] at end of line', () => {
+      const errors = lintContent(
+        'Use [foo]\n\n[foo]: https://example.com\n',
+      );
+      assert.equal(errors.length, 1);
+    });
+
+    it('skips unresolved inline links with template URLs', () => {
+      const errors = lintContent(
+        'See [issues]({{% param _issues %}}).\n',
+      );
       assert.equal(errors.length, 0);
     });
   });

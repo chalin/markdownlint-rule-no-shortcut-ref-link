@@ -81,8 +81,14 @@ no-shortcut-ref-link:
   ignore_pattern: '^\d+$'
 ```
 
-GitHub alert syntax (`[!NOTE]`, `[!WARNING]`, etc.) is always skipped
-regardless of configuration.
+The following are always skipped regardless of configuration:
+
+- GitHub alert syntax: `[!NOTE]`, `[!WARNING]`, etc.
+- Footnote references: `[^1]`, `[^note]`, etc.
+- Labels embedded in identifiers: e.g. `otel.[name].enabled`, where both the
+  character before `[` and after `]` are alphanumeric or `.`.
+- Unresolved inline links: e.g. `[text]({{...}})`, where `]` is immediately
+  followed by `(`. This covers template URLs that micromark cannot parse.
 
 ### 4. Fix violations
 

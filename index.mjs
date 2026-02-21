@@ -16,6 +16,11 @@ import {
 } from 'markdownlint-rule-helpers/micromark';
 
 const singleWordRe = /^\S+$/;
+// When the characters immediately before `[` and after `]` both match this
+// pattern, the token is treated as embedded in an identifier (e.g.
+// otel.[name].enabled) and skipped. Excludes _ and * since those are
+// Markdown emphasis delimiters.
+const identCharRe = /[a-zA-Z0-9.]/;
 
 function buildIgnoreRe(config) {
   const pattern = config.ignore_pattern;
@@ -23,16 +28,27 @@ function buildIgnoreRe(config) {
   return new RegExp(pattern);
 }
 
+function isEmbeddedInIdentifier(line, token) {
+  const before = line[token.startColumn - 2]; // char before '['
+  const after = line[token.endColumn - 1]; // char after ']'
+  return before && after && identCharRe.test(before) && identCharRe.test(after);
+}
+
 function reportShortcut(onError, params, labelText, token, ignoreRe) {
   if (!singleWordRe.test(labelText)) return;
   if (labelText.startsWith('!')) return; // GitHub alert syntax, e.g. [!NOTE]
+  if (labelText.startsWith('^')) return; // footnote syntax, e.g. [^1]
   if (ignoreRe && ignoreRe.test(labelText)) return;
   if (token.startLine !== token.endLine) return;
+
+  const line = params.lines[token.startLine - 1];
+  if (isEmbeddedInIdentifier(line, token)) return;
+  if (line[token.endColumn - 1] === '(') return; // unresolved inline link, e.g. [text]({{...}})
 
   onError({
     lineNumber: token.startLine,
     detail: `Use [${labelText}][] instead of [${labelText}]`,
-    context: params.lines[token.startLine - 1].trim(),
+    context: line.trim(),
     range: [token.startColumn, token.endColumn - token.startColumn],
     fixInfo: {
       editColumn: token.endColumn,
