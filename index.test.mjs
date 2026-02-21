@@ -8,6 +8,7 @@ import rule from './index.mjs';
 
 const ruleName = 'no-shortcut-ref-link';
 
+/** @param {boolean | Record<string, unknown>} [ruleConfig] */
 function lintContent(content, ruleConfig = true) {
   const results = lint({
     strings: { content },
@@ -17,6 +18,7 @@ function lintContent(content, ruleConfig = true) {
   return results.content;
 }
 
+/** @param {boolean | Record<string, unknown>} [ruleConfig] */
 function fixContent(content, ruleConfig = true) {
   const errors = lintContent(content, ruleConfig);
   return applyFixes(content, errors);
@@ -125,6 +127,7 @@ describe(ruleName, () => {
     it('flags undefined [word] by default', () => {
       const errors = lintContent('This [word] has no definition.\n');
       assert.equal(errors.length, 1);
+      assert.ok(errors[0].errorDetail);
       assert.match(errors[0].errorDetail, /\[word\]\[\]/);
     });
 
@@ -169,6 +172,7 @@ describe(ruleName, () => {
         { check_undefined: false },
       );
       assert.equal(errors.length, 1);
+      assert.ok(errors[0].errorDetail);
       assert.match(errors[0].errorDetail, /\[defined\]/);
     });
   });
@@ -180,6 +184,7 @@ describe(ruleName, () => {
         { ignore_pattern: '^v\\d' },
       );
       assert.equal(errors.length, 1);
+      assert.ok(errors[0].errorDetail);
       assert.match(errors[0].errorDetail, /\[foo\]/);
     });
 
@@ -188,6 +193,7 @@ describe(ruleName, () => {
         ignore_pattern: '^\\d+$',
       });
       assert.equal(errors.length, 1);
+      assert.ok(errors[0].errorDetail);
       assert.match(errors[0].errorDetail, /\[foo\]/);
     });
 
@@ -247,6 +253,28 @@ describe(ruleName, () => {
     it('skips unresolved inline links with template URLs', () => {
       const errors = lintContent('See [issues]({{% param _issues %}}).\n');
       assert.equal(errors.length, 0);
+    });
+  });
+
+  describe('HTML script blocks', () => {
+    it('does not flag or modify JS array syntax inside a script tag', () => {
+      const input =
+        '<script id="main-script">\n' +
+        "        link.href = item['html_url'];\n" +
+        '</script>\n' +
+        '\n' +
+        'Some [other-link] that gets fixed ...\n';
+      const errors = lintContent(input);
+      assert.equal(errors.length, 1);
+      const fixed = fixContent(input);
+      assert.equal(
+        fixed,
+        '<script id="main-script">\n' +
+          "        link.href = item['html_url'];\n" +
+          '</script>\n' +
+          '\n' +
+          'Some [other-link][] that gets fixed ...\n',
+      );
     });
   });
 });

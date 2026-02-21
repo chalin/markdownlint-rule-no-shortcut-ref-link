@@ -89,10 +89,21 @@ export default {
       !!params.config.check_undefined;
     if (!checkUndefined) return;
 
+    const htmlFlowRanges = filterByTypes(tokens, ['htmlFlow']).map((t) => [
+      t.startLine,
+      t.endLine,
+    ]);
+
     const undefinedShortcuts = filterByTypes(tokens, [
       'undefinedReferenceShortcut',
     ]);
     for (const token of undefinedShortcuts) {
+      if (
+        htmlFlowRanges.some(
+          ([start, end]) => token.startLine >= start && token.endLine <= end,
+        )
+      )
+        continue;
       const undefinedRef = getDescendantsByType(token, [
         'undefinedReference',
       ])[0];
