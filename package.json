@@ -1,0 +1,37 @@
+{
+  "name": "markdownlint-rule-no-shortcut-ref-link",
+  "version": "0.1.0",
+  "description": "A markdownlint rule that flags shortcut reference links and converts them to collapsed form",
+  "license": "Apache-2.0",
+  "author": "chalin",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chalin/markdownlint-rule-no-shortcut-ref-link.git"
+  },
+  "homepage": "https://github.com/chalin/markdownlint-rule-no-shortcut-ref-link",
+  "bugs": "https://github.com/chalin/markdownlint-rule-no-shortcut-ref-link/issues",
+  "type": "module",
+  "exports": "./index.mjs",
+  "scripts": {
+    "test": "node --test"
+  },
+  "files": [
+    "index.mjs",
+    "LICENSE",
+    "README.md"
+  ],
+  "keywords": [
+    "markdownlint-rule",
+    "markdownlint",
+    "markdown",
+    "links",
+    "lint"
+  ],
+  "peerDependencies": {
+    "markdownlint-rule-helpers": ">=0.27.0"
+  },
+  "devDependencies": {
+    "markdownlint": "^0.40.0",
+    "markdownlint-rule-helpers": "^0.30.0"
+  }
+}
