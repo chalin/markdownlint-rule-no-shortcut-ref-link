@@ -1,0 +1,8 @@
+customRules:
+  - ./index.mjs
+
+ignores:
+  - '**/node_modules/**'
+
+config:
+  extends: .markdownlint.yaml

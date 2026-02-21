@@ -112,4 +112,5 @@ version.
 [CommonMark]: https://spec.commonmark.org/
 [markdownlint]: https://github.com/DavidAnson/markdownlint
 [reference links]: https://spec.commonmark.org/0.31.2/#reference-link
-[shortcut reference links]: https://spec.commonmark.org/0.31.2/#shortcut-reference-link
+[shortcut reference links]:
+  https://spec.commonmark.org/0.31.2/#shortcut-reference-link

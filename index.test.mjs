@@ -209,9 +209,7 @@ describe(ruleName, () => {
 
   describe('embedded in identifier', () => {
     it('skips [name] embedded in a dotted path', () => {
-      const errors = lintContent(
-        'otel.instrumentation.[name].enabled\n',
-      );
+      const errors = lintContent('otel.instrumentation.[name].enabled\n');
       assert.equal(errors.length, 0);
     });
 
@@ -242,16 +240,12 @@ describe(ruleName, () => {
     });
 
     it('flags [foo] at end of line', () => {
-      const errors = lintContent(
-        'Use [foo]\n\n[foo]: https://example.com\n',
-      );
+      const errors = lintContent('Use [foo]\n\n[foo]: https://example.com\n');
       assert.equal(errors.length, 1);
     });
 
     it('skips unresolved inline links with template URLs', () => {
-      const errors = lintContent(
-        'See [issues]({{% param _issues %}}).\n',
-      );
+      const errors = lintContent('See [issues]({{% param _issues %}}).\n');
       assert.equal(errors.length, 0);
     });
   });
