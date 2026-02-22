@@ -7,13 +7,22 @@
 // collapsed form is unambiguous.
 //
 // Config:
-//   check_undefined (default: true) - also flag [word] when no definition exists
+//   check_undefined (default: "all") - flag undefined shortcut refs:
+//     "all"    - flag single-word and multi-word undefined refs (default)
+//     "single" - flag single-word undefined refs only
+//     "off"    - don't flag undefined refs
 //   ignore_pattern (default: none) - regex; labels matching this pattern are skipped
 
 import {
   filterByTypes,
   getDescendantsByType,
 } from 'markdownlint-rule-helpers/micromark';
+
+// Some markdownlint-injected token types (e.g. undefinedReference*) are absent
+// from micromark-util-types' TokenTypeMap. This helper casts a string to the
+// TokenType expected by filterByTypes / getDescendantsByType.
+/** @param {string} s @returns {import('micromark-util-types').TokenType} */
+const tt = (s) => /** @type {any} */ (s);
 
 const singleWordRe = /^\S+$/;
 // When the characters immediately before `[` and after `]` both match this
@@ -35,7 +44,6 @@ function isEmbeddedInIdentifier(line, token) {
 }
 
 function reportShortcut(onError, params, labelText, token, ignoreRe) {
-  if (!singleWordRe.test(labelText)) return;
   if (labelText.startsWith('!')) return; // GitHub alert syntax, e.g. [!NOTE]
   if (labelText.startsWith('^')) return; // footnote syntax, e.g. [^1]
   if (ignoreRe && ignoreRe.test(labelText)) return;
@@ -84,10 +92,17 @@ export default {
     }
 
     // Undefined shortcut references (when check_undefined is enabled)
-    const checkUndefined =
-      params.config.check_undefined === undefined ||
-      !!params.config.check_undefined;
-    if (!checkUndefined) return;
+    const checkUndefined = params.config.check_undefined ?? 'all';
+    if (
+      checkUndefined !== 'all' &&
+      checkUndefined !== 'single' &&
+      checkUndefined !== 'off'
+    ) {
+      throw new Error(
+        `no-shortcut-ref-link: check_undefined must be "all", "single", or "off"; got: ${JSON.stringify(checkUndefined)}`,
+      );
+    }
+    if (checkUndefined === 'off') return;
 
     const htmlFlowRanges = filterByTypes(tokens, ['htmlFlow']).map((t) => [
       t.startLine,
@@ -95,7 +110,7 @@ export default {
     ]);
 
     const undefinedShortcuts = filterByTypes(tokens, [
-      'undefinedReferenceShortcut',
+      tt('undefinedReferenceShortcut'),
     ]);
     for (const token of undefinedShortcuts) {
       if (
@@ -105,11 +120,13 @@ export default {
       )
         continue;
       const undefinedRef = getDescendantsByType(token, [
-        'undefinedReference',
+        tt('undefinedReference'),
       ])[0];
       if (!undefinedRef) continue;
 
       const labelText = undefinedRef.children.map((t) => t.text).join('');
+      if (!singleWordRe.test(labelText) && checkUndefined === 'single')
+        continue;
       reportShortcut(onError, params, labelText, token, ignoreRe);
     }
   },

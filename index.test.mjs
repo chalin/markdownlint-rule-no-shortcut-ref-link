@@ -8,7 +8,7 @@ import rule from './index.mjs';
 
 const ruleName = 'no-shortcut-ref-link';
 
-/** @param {boolean | Record<string, unknown>} [ruleConfig] */
+/** @param {boolean | string | Record<string, unknown>} [ruleConfig] */
 function lintContent(content, ruleConfig = true) {
   const results = lint({
     strings: { content },
@@ -18,7 +18,7 @@ function lintContent(content, ruleConfig = true) {
   return results.content;
 }
 
-/** @param {boolean | Record<string, unknown>} [ruleConfig] */
+/** @param {boolean | string | Record<string, unknown>} [ruleConfig] */
 function fixContent(content, ruleConfig = true) {
   const errors = lintContent(content, ruleConfig);
   return applyFixes(content, errors);
@@ -56,11 +56,18 @@ describe(ruleName, () => {
       assert.equal(errors.length, 0);
     });
 
-    it('does not flag multi-word shortcut references', () => {
-      const errors = lintContent(
-        'See [Custom Rules] for details.\n\n[Custom Rules]: https://example.com\n',
+    it('flags and fixes multi-word shortcut references', () => {
+      const input =
+        'See [Custom Rules] for details.\n\n[Custom Rules]: https://example.com\n';
+      const errors = lintContent(input);
+      assert.equal(errors.length, 1);
+      assert.ok(errors[0].errorDetail);
+      assert.match(errors[0].errorDetail, /\[Custom Rules\]/);
+      const fixed = fixContent(input);
+      assert.equal(
+        fixed,
+        'See [Custom Rules][] for details.\n\n[Custom Rules]: https://example.com\n',
       );
-      assert.equal(errors.length, 0);
     });
 
     it('flags multiple shortcut references on the same line', () => {
@@ -123,30 +130,32 @@ describe(ruleName, () => {
     });
   });
 
-  describe('undefined shortcut references (check_undefined)', () => {
-    it('flags undefined [word] by default', () => {
+  describe('check_undefined: "all" (default)', () => {
+    it('flags single-word undefined refs by default', () => {
       const errors = lintContent('This [word] has no definition.\n');
       assert.equal(errors.length, 1);
       assert.ok(errors[0].errorDetail);
       assert.match(errors[0].errorDetail, /\[word\]\[\]/);
     });
 
-    it('does not flag undefined [word] when check_undefined is false', () => {
-      const errors = lintContent('This [word] has no definition.\n', {
-        check_undefined: false,
-      });
-      assert.equal(errors.length, 0);
-    });
-
-    it('does not flag multi-word undefined references', () => {
+    it('flags multi-word undefined refs by default', () => {
       const errors = lintContent('This [two words] has no definition.\n');
-      assert.equal(errors.length, 0);
+      assert.equal(errors.length, 1);
+      assert.ok(errors[0].errorDetail);
+      assert.match(errors[0].errorDetail, /\[two words\]/);
     });
 
-    it('fixes undefined [word] to [word][]', () => {
+    it('fixes single-word undefined ref', () => {
       const input = 'See [foo] for details.\n';
-      const fixed = fixContent(input);
-      assert.equal(fixed, 'See [foo][] for details.\n');
+      assert.equal(fixContent(input), 'See [foo][] for details.\n');
+    });
+
+    it('fixes multi-word undefined ref', () => {
+      const input = 'This [two words] has no definition.\n';
+      assert.equal(
+        fixContent(input),
+        'This [two words][] has no definition.\n',
+      );
     });
 
     it('flags both defined and undefined shortcuts together', () => {
@@ -166,14 +175,77 @@ describe(ruleName, () => {
       assert.equal(errors.length, 0);
     });
 
-    it('still flags defined shortcuts when check_undefined is false', () => {
+    it('same behavior with explicit check_undefined: "all"', () => {
+      const errors = lintContent('See [word] and [two words] here.\n', {
+        check_undefined: 'all',
+      });
+      assert.equal(errors.length, 2);
+    });
+  });
+
+  describe('check_undefined: "single"', () => {
+    it('flags single-word undefined refs', () => {
+      const errors = lintContent('This [word] has no definition.\n', {
+        check_undefined: 'single',
+      });
+      assert.equal(errors.length, 1);
+    });
+
+    it('does not flag multi-word undefined refs', () => {
+      const errors = lintContent('This [two words] has no definition.\n', {
+        check_undefined: 'single',
+      });
+      assert.equal(errors.length, 0);
+    });
+
+    it('still flags defined shortcuts', () => {
       const errors = lintContent(
         'See [defined] and [undefined] here.\n\n[defined]: https://example.com\n',
-        { check_undefined: false },
+        { check_undefined: 'single' },
+      );
+      assert.equal(errors.length, 2);
+    });
+  });
+
+  describe('check_undefined: "off"', () => {
+    it('does not flag any undefined refs', () => {
+      const errors = lintContent('See [word] and [two words] here.\n', {
+        check_undefined: 'off',
+      });
+      assert.equal(errors.length, 0);
+    });
+
+    it('still flags defined shortcuts', () => {
+      const errors = lintContent(
+        'See [defined] and [undefined] here.\n\n[defined]: https://example.com\n',
+        { check_undefined: 'off' },
       );
       assert.equal(errors.length, 1);
       assert.ok(errors[0].errorDetail);
       assert.match(errors[0].errorDetail, /\[defined\]/);
+    });
+  });
+
+  describe('check_undefined validation', () => {
+    it('throws for an unrecognized string value', () => {
+      assert.throws(
+        () => lintContent('text\n', { check_undefined: 'invalid' }),
+        /check_undefined/,
+      );
+    });
+
+    it('throws for boolean true', () => {
+      assert.throws(
+        () => lintContent('text\n', { check_undefined: true }),
+        /check_undefined/,
+      );
+    });
+
+    it('throws for boolean false', () => {
+      assert.throws(
+        () => lintContent('text\n', { check_undefined: false }),
+        /check_undefined/,
+      );
     });
   });
 
@@ -206,7 +278,7 @@ describe(ruleName, () => {
 
     it('does not interfere with check_undefined', () => {
       const errors = lintContent('See [1] and [foo] here.\n', {
-        check_undefined: false,
+        check_undefined: 'off',
         ignore_pattern: '^\\d+$',
       });
       assert.equal(errors.length, 0);

@@ -1,34 +1,42 @@
 # markdownlint-rule-no-shortcut-ref-link
 
-> A [markdownlint][] rule that flags [shortcut reference links][] and offers an
-> auto-fix to convert them to [collapsed][] form.
+> A [markdownlint][] companion rule to [MD052][] that flags [shortcut reference
+> links][shortcut-ref] and can auto-convert them to [collapsed][] form.
 
 Markdown supports three forms of [reference links][]:
 
-| Form      | Syntax          | Example            |
-| --------- | --------------- | ------------------ |
-| Full      | `[text][label]` | `[click here][ex]` |
-| Collapsed | `[label][]`     | `[example][]`      |
-| Shortcut  | `[label]`       | `[example]`        |
+| Form      | Syntax          | Example             |
+| --------- | --------------- | ------------------- |
+| Full      | `[text][label]` | `[about us][about]` |
+| Collapsed | `[label][]`     | `[example][]`       |
+| Shortcut  | `[label]`       | `[example]`         |
 
-The **shortcut** form (`[label]`) is valid [CommonMark][] but is not
-consistently recognized by all Markdown tools, including some [markdownlint][]
-rules. This rule flags shortcut reference links and provides an auto-fix to
-convert them to the unambiguous **collapsed** form (`[label][]`).
+## Why this rule?
 
-## Why avoid shortcut references?
+An **undefined reference** is a reference link with no matching definition.
+[MD052][] reports undefined references, but it **ignores shortcut syntax** by
+default because bracketed text can be ambiguous.
 
-The built-in markdownlint rule [MD052][] (`reference-links-images`) flags
-reference links whose label has no matching definition. However, by default it
-only checks collapsed (`[label][]`) and full (`[text][label]`) forms. Shortcut
-references (`[label]`) are silently ignored.
+To catch undefined shortcut references, you can either:
 
-This means that if you write `[example]` and forget the definition, no linter
-warning is produced -- the text simply renders as literal `[example]` instead of
-a link. With the collapsed form `[example][]`, MD052 catches the missing
-definition immediately.
+- _Configure MD052_ to report undefined shortcut references. Note that this can
+  be hard to tune for your content.
+- _Use this companion rule_ to auto-convert shortcut refs to the unambiguous
+  collapsed form (`[label][]`), then let MD052 catch missing definitions.
 
-[MD052]: https://github.com/DavidAnson/markdownlint/blob/main/doc/md052.md
+For details, including sample MD052 configuration, see
+[MD052 vs this rule](#md052-vs-this-rule).
+
+## Scope
+
+- A defined shortcut is `[label]` with a matching link definition in the same
+  document.
+
+- **Defined shortcuts** are flagged for both single- and multi-word labels (for
+  example, `[Custom Rules]`).
+
+- Flagging of **undefined shortcuts** is controlled by
+  [`check_undefined`](#check_undefined): `all` (default), `single`, or `off`.
 
 ## Install
 
@@ -59,19 +67,28 @@ no-shortcut-ref-link: true
 
 ### 3. Configure (optional)
 
-| Option            | Type    | Default | Description                                       |
-| ----------------- | ------- | ------- | ------------------------------------------------- |
-| `check_undefined` | boolean | `true`  | Also flag `[word]` when no link definition exists |
-| `ignore_pattern`  | string  | (none)  | Regex; labels matching this pattern are skipped   |
+| Option            | Type                                | Default | Description                                              |
+| ----------------- | ----------------------------------- | ------- | -------------------------------------------------------- |
+| `check_undefined` | String enum: `all`, `single`, `off` | `all`   | Controls flagging of undefined shortcut refs (see below) |
+| `ignore_pattern`  | String                              | (none)  | Regex; labels matching this pattern are skipped          |
 
-By default, the rule flags all single-word shortcut references, whether or not a
-matching link definition exists. Set `check_undefined: false` to only flag
-shortcuts that have a definition:
+#### `check_undefined`
+
+| Value    | Behavior                                                              |
+| -------- | --------------------------------------------------------------------- |
+| `all`    | Flag all undefined refs, single- and multi-word _(default)_           |
+| `single` | Flag single-word undefined refs only, e.g. `[word]`                   |
+| `off`    | Do not flag undefined refs; only flag refs with a matching definition |
+
+For example, set `check_undefined: single` to flag only single-word undefined
+references:
 
 ```yaml
 no-shortcut-ref-link:
-  check_undefined: false
+  check_undefined: single
 ```
+
+#### `ignore_pattern`
 
 Use `ignore_pattern` to skip labels that match a regular expression. For
 example, to ignore footnote-style numeric references like `[1]`:
@@ -81,7 +98,8 @@ no-shortcut-ref-link:
   ignore_pattern: '^\d+$'
 ```
 
-The following are always skipped regardless of configuration:
+The following are always skipped regardless of configuration to avoid common
+false positives:
 
 - GitHub alert syntax: `[!NOTE]`, `[!WARNING]`, etc.
 - Footnote references: `[^1]`, `[^note]`, etc.
@@ -90,7 +108,7 @@ The following are always skipped regardless of configuration:
 - Unresolved inline links: e.g. `[text]({{...}})`, where `]` is immediately
   followed by `(`. This covers template URLs that micromark cannot parse.
 
-### 4. Fix violations
+### 4. Fix violations (optional)
 
 Run your linter with the `--fix` flag to auto-convert shortcut references:
 
@@ -98,19 +116,41 @@ Run your linter with the `--fix` flag to auto-convert shortcut references:
 npx markdownlint-cli2 --fix '**/*.md'
 ```
 
-## Scope
+## MD052 vs this rule
 
-The rule currently flags **single-word** shortcut reference links (labels with
-no whitespace). Multi-word shortcut references may be supported in a future
-version.
+Use **[MD052][]** (`reference-links-images`) when:
+
+- You only need undefined-reference checks.
+- `shortcut_syntax: true` with configured `ignored_labels` covers your needs.
+
+Example config:
+
+```yaml
+reference-links-images:
+  shortcut_syntax: true
+  ignored_labels:
+    # Ignore GitHub alert syntax
+    - '!note'
+    - '!warning'
+    - ...
+    # Ignore footnote-style numeric references
+    - '1'
+    - '2'
+    - ...
+```
+
+Use **this rule** (`no-shortcut-ref-link`) as a companion when:
+
+- You want to standardize on collapsed syntax (`[label][]`).
+- You want auto-fix from shortcut to collapsed form.
+- MD052 configuration alone is noisy or hard to tune for your content.
 
 ## License
 
 [Apache-2.0](LICENSE)
 
 [collapsed]: https://spec.commonmark.org/0.31.2/#collapsed-reference-link
-[CommonMark]: https://spec.commonmark.org/
 [markdownlint]: https://github.com/DavidAnson/markdownlint
+[MD052]: https://github.com/DavidAnson/markdownlint/blob/main/doc/md052.md
 [reference links]: https://spec.commonmark.org/0.31.2/#reference-link
-[shortcut reference links]:
-  https://spec.commonmark.org/0.31.2/#shortcut-reference-link
+[shortcut-ref]: https://spec.commonmark.org/0.31.2/#shortcut-reference-link

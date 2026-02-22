@@ -8,6 +8,13 @@ and this project adheres to
 
 ## [Unreleased][]
 
+### Added
+
+- `check_undefined` is now a string enum: `all` (default), `single`, or
+  `off`.
+- Multi-word shortcut references that have a matching link definition are now
+  flagged and fixed. Previously only single-word defined references were caught.
+
 ### Fixed
 
 - Do not flag or modify JavaScript array syntax (e.g. `item['html_url']`) inside
