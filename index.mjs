@@ -1,17 +1,5 @@
 // @ts-check
-//
-// Markdownlint rule to detect shortcut reference links like [abc] and convert
-// them to collapsed form [abc][].
-//
-// The shortcut form is valid CommonMark but can confuse some tools. The
-// collapsed form is unambiguous.
-//
-// Config:
-//   check_undefined (default: "all") - flag undefined shortcut refs:
-//     "all"    - flag single-word and multi-word undefined refs (default)
-//     "single" - flag single-word undefined refs only
-//     "off"    - don't flag undefined refs
-//   ignore_pattern (default: none) - regex; labels matching this pattern are skipped
+// See README.md for behavior and configuration.
 
 import {
   filterByTypes,
@@ -24,7 +12,6 @@ import {
 /** @param {string} s @returns {import('micromark-util-types').TokenType} */
 const tt = (s) => /** @type {any} */ (s);
 
-const singleWordRe = /^\S+$/;
 // When the characters immediately before `[` and after `]` both match this
 // pattern, the token is treated as embedded in an identifier (e.g.
 // otel.[name].enabled) and skipped. Excludes _ and * since those are
@@ -92,17 +79,16 @@ export default {
     }
 
     // Undefined shortcut references (when check_undefined is enabled)
-    const checkUndefined = params.config.check_undefined ?? 'all';
-    if (
-      checkUndefined !== 'all' &&
-      checkUndefined !== 'single' &&
-      checkUndefined !== 'off'
-    ) {
-      throw new Error(
-        `no-shortcut-ref-link: check_undefined must be "all", "single", or "off"; got: ${JSON.stringify(checkUndefined)}`,
-      );
+    let checkUndefined = true;
+    if (params.config.check_undefined !== undefined) {
+      checkUndefined = params.config.check_undefined;
+      if (typeof checkUndefined !== 'boolean') {
+        throw new Error(
+          `no-shortcut-ref-link: check_undefined must be true or false; got: ${JSON.stringify(checkUndefined)}`,
+        );
+      }
     }
-    if (checkUndefined === 'off') return;
+    if (!checkUndefined) return;
 
     // Find htmlFlow ranges for raw-content blocks.
     const rawHtmlBlockStartRe = /<\s*(?:script|style|pre|textarea)\b/i;
@@ -131,8 +117,6 @@ export default {
       if (!undefinedRef) continue;
 
       const labelText = undefinedRef.children.map((t) => t.text).join('');
-      if (!singleWordRe.test(labelText) && checkUndefined === 'single')
-        continue;
       reportShortcut(onError, params, labelText, token, ignoreRe);
     }
   },

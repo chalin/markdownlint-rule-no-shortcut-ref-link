@@ -35,8 +35,9 @@ For details, including sample MD052 configuration, see
 - **Defined shortcuts** are flagged for both single- and multi-word labels (for
   example, `[Custom Rules]`).
 
-- Flagging of **undefined shortcuts** is controlled by
-  [`check_undefined`](#check_undefined): `all` (default), `single`, or `off`.
+- **Undefined shortcuts** are flagged by default. Set
+  [`check_undefined`](#check_undefined) to `false` to only flag refs with a
+  matching definition.
 
 ## Install
 
@@ -67,25 +68,19 @@ no-shortcut-ref-link: true
 
 ### 3. Configure (optional)
 
-| Option            | Type                                | Default | Description                                              |
-| ----------------- | ----------------------------------- | ------- | -------------------------------------------------------- |
-| `check_undefined` | String enum: `all`, `single`, `off` | `all`   | Controls flagging of undefined shortcut refs (see below) |
-| `ignore_pattern`  | String                              | (none)  | Regex; labels matching this pattern are skipped          |
+| Option            | Type    | Default | Description                                                     |
+| ----------------- | ------- | ------- | --------------------------------------------------------------- |
+| `check_undefined` | boolean | `true`  | When `true`, flag undefined shortcut refs; when `false`, don't. |
+| `ignore_pattern`  | string  | (none)  | Regex; labels matching this pattern are skipped                 |
 
 #### `check_undefined`
 
-| Value    | Behavior                                                              |
-| -------- | --------------------------------------------------------------------- |
-| `all`    | Flag all undefined refs, single- and multi-word _(default)_           |
-| `single` | Flag single-word undefined refs only, e.g. `[word]`                   |
-| `off`    | Do not flag undefined refs; only flag refs with a matching definition |
-
-For example, set `check_undefined: single` to flag only single-word undefined
-references:
+To only flag shortcut refs that have a definition (and ignore undefined ones),
+set `check_undefined: false`:
 
 ```yaml
 no-shortcut-ref-link:
-  check_undefined: single
+  check_undefined: false
 ```
 
 #### `ignore_pattern`

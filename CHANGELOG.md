@@ -8,13 +8,10 @@ and this project adheres to
 
 ## [Unreleased][]
 
-### Breaking
+### Changed
 
-- `check_undefined` is now a string enum only: `"all"` (default), `"single"`, or
-  `"off"`. The previous boolean values `true` and `false` are no longer accepted
-  and will throw. The default is now `"all"` (flag all undefined refs); use
-  `"single"` for the old default behavior (single-word only), or `"off"` to
-  disable undefined checking.
+- Undefined shortcut checking now flags all undefined shortcut refs when enabled
+  (not just single-word refs).
 
 ### Added
 
@@ -24,9 +21,9 @@ and this project adheres to
 
 ### Fixed
 
-- Do not flag or modify content inside raw-content HTML blocks. Undefined
-  shortcut refs inside other HTML blocks (e.g. `<div>`) are still flagged and
-  fixed.
+- Do not flag or modify content inside raw-content HTML blocks (`<script>`,
+  `<style>`, `<pre>`, `<textarea>`). Undefined shortcut refs inside other HTML
+  blocks (e.g. `<div>`) are still flagged and fixed.
 
 ## [v0.2.0][]
 

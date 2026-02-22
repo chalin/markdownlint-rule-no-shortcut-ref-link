@@ -130,7 +130,7 @@ describe(ruleName, () => {
     });
   });
 
-  describe('check_undefined: "all" (default)', () => {
+  describe('check_undefined: true (default)', () => {
     it('flags single-word undefined refs by default', () => {
       const errors = lintContent('This [word] has no definition.\n');
       assert.equal(errors.length, 1);
@@ -175,42 +175,18 @@ describe(ruleName, () => {
       assert.equal(errors.length, 0);
     });
 
-    it('same behavior with explicit check_undefined: "all"', () => {
+    it('same behavior with explicit check_undefined: true', () => {
       const errors = lintContent('See [word] and [two words] here.\n', {
-        check_undefined: 'all',
+        check_undefined: true,
       });
       assert.equal(errors.length, 2);
     });
   });
 
-  describe('check_undefined: "single"', () => {
-    it('flags single-word undefined refs', () => {
-      const errors = lintContent('This [word] has no definition.\n', {
-        check_undefined: 'single',
-      });
-      assert.equal(errors.length, 1);
-    });
-
-    it('does not flag multi-word undefined refs', () => {
-      const errors = lintContent('This [two words] has no definition.\n', {
-        check_undefined: 'single',
-      });
-      assert.equal(errors.length, 0);
-    });
-
-    it('still flags defined shortcuts', () => {
-      const errors = lintContent(
-        'See [defined] and [undefined] here.\n\n[defined]: https://example.com\n',
-        { check_undefined: 'single' },
-      );
-      assert.equal(errors.length, 2);
-    });
-  });
-
-  describe('check_undefined: "off"', () => {
+  describe('check_undefined: false', () => {
     it('does not flag any undefined refs', () => {
       const errors = lintContent('See [word] and [two words] here.\n', {
-        check_undefined: 'off',
+        check_undefined: false,
       });
       assert.equal(errors.length, 0);
     });
@@ -218,7 +194,7 @@ describe(ruleName, () => {
     it('still flags defined shortcuts', () => {
       const errors = lintContent(
         'See [defined] and [undefined] here.\n\n[defined]: https://example.com\n',
-        { check_undefined: 'off' },
+        { check_undefined: false },
       );
       assert.equal(errors.length, 1);
       assert.ok(errors[0].errorDetail);
@@ -227,25 +203,13 @@ describe(ruleName, () => {
   });
 
   describe('check_undefined validation', () => {
-    it('throws for an unrecognized string value', () => {
-      assert.throws(
-        () => lintContent('text\n', { check_undefined: 'invalid' }),
-        /check_undefined/,
-      );
-    });
-
-    it('throws for boolean true', () => {
-      assert.throws(
-        () => lintContent('text\n', { check_undefined: true }),
-        /check_undefined/,
-      );
-    });
-
-    it('throws for boolean false', () => {
-      assert.throws(
-        () => lintContent('text\n', { check_undefined: false }),
-        /check_undefined/,
-      );
+    it('throws when check_undefined is not a boolean', () => {
+      for (const value of ['all', 'single', 'off', 1, null]) {
+        assert.throws(
+          () => lintContent('text\n', { check_undefined: value }),
+          /check_undefined must be true or false/,
+        );
+      }
     });
   });
 
@@ -278,7 +242,7 @@ describe(ruleName, () => {
 
     it('does not interfere with check_undefined', () => {
       const errors = lintContent('See [1] and [foo] here.\n', {
-        check_undefined: 'off',
+        check_undefined: false,
         ignore_pattern: '^\\d+$',
       });
       assert.equal(errors.length, 0);
