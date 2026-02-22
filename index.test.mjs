@@ -328,7 +328,7 @@ describe(ruleName, () => {
     });
   });
 
-  describe('HTML script blocks', () => {
+  describe('HTML raw-content blocks', () => {
     it('does not flag or modify JS array syntax inside a script tag', () => {
       const input =
         '<script id="main-script">\n' +
@@ -344,6 +344,58 @@ describe(ruleName, () => {
         '<script id="main-script">\n' +
           "        link.href = item['html_url'];\n" +
           '</script>\n' +
+          '\n' +
+          'Some [other-link][] that gets fixed ...\n',
+      );
+    });
+
+    it('flags undefined shortcuts inside non-script HTML blocks', () => {
+      const input =
+        '<div>\n' + 'See [Custom Rules] for caveats.\n' + '</div>\n';
+      const fixed = fixContent(input);
+      assert.equal(
+        fixed,
+        '<div>\n' + 'See [Custom Rules][] for caveats.\n' + '</div>\n',
+      );
+      const errors = lintContent(input);
+      assert.equal(errors.length, 1);
+    });
+
+    it('does not flag or modify bracket syntax inside a pre tag', () => {
+      const input =
+        '<pre>\n' +
+        "item['html_url']\n" +
+        '</pre>\n' +
+        '\n' +
+        'Some [other-link] that gets fixed ...\n';
+      const errors = lintContent(input);
+      assert.equal(errors.length, 1);
+      const fixed = fixContent(input);
+      assert.equal(
+        fixed,
+        '<pre>\n' +
+          "item['html_url']\n" +
+          '</pre>\n' +
+          '\n' +
+          'Some [other-link][] that gets fixed ...\n',
+      );
+    });
+
+    it('does not flag or modify CSS content inside a style tag', () => {
+      const input =
+        '<style>\n' +
+        ".x::before { content: '[inside]'; }\n" +
+        '</style>\n' +
+        '\n' +
+        'Some [other-link] that gets fixed ...\n';
+      const errors = lintContent(input);
+      assert.equal(errors.length, 1);
+      const fixed = fixContent(input);
+      assert.equal(
+        fixed,
+        '<style>\n' +
+          ".x::before { content: '[inside]'; }\n" +
+          '</style>\n' +
           '\n' +
           'Some [other-link][] that gets fixed ...\n',
       );

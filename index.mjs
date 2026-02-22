@@ -104,10 +104,13 @@ export default {
     }
     if (checkUndefined === 'off') return;
 
-    const htmlFlowRanges = filterByTypes(tokens, ['htmlFlow']).map((t) => [
-      t.startLine,
-      t.endLine,
-    ]);
+    // Find htmlFlow ranges for raw-content blocks.
+    const rawHtmlBlockStartRe = /<\s*(?:script|style|pre|textarea)\b/i;
+    const htmlFlowRanges = filterByTypes(tokens, ['htmlFlow'])
+      .filter((t) =>
+        rawHtmlBlockStartRe.test(params.lines[t.startLine - 1] ?? ''),
+      )
+      .map((t) => [t.startLine, t.endLine]);
 
     const undefinedShortcuts = filterByTypes(tokens, [
       tt('undefinedReferenceShortcut'),
@@ -117,8 +120,11 @@ export default {
         htmlFlowRanges.some(
           ([start, end]) => token.startLine >= start && token.endLine <= end,
         )
-      )
+      ) {
+        // Ignore undefined refs in raw-content blocks.
         continue;
+      }
+
       const undefinedRef = getDescendantsByType(token, [
         tt('undefinedReference'),
       ])[0];

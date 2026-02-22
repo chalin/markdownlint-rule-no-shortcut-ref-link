@@ -43,7 +43,7 @@ For details, including sample MD052 configuration, see
 From GitHub:
 
 ```sh
-npm install github:chalin/markdownlint-rule-no-shortcut-ref-link#semver:0.2.0 --save-dev
+npm install github:chalin/markdownlint-rule-no-shortcut-ref-link#semver:0.3.0 --save-dev
 ```
 
 ## Usage
@@ -107,6 +107,9 @@ false positives:
   character before `[` and after `]` are alphanumeric or `.`.
 - Unresolved inline links: e.g. `[text]({{...}})`, where `]` is immediately
   followed by `(`. This covers template URLs that micromark cannot parse.
+- Content inside raw-content HTML blocks (`<script>`, `<style>`, `<pre>`,
+  `<textarea>`) so JS/CSS/textarea/pre bracket syntax is not touched. Shortcut
+  refs inside other HTML blocks (e.g. `<div>`) are still flagged and fixed.
 
 ### 4. Fix violations (optional)
 
@@ -145,10 +148,12 @@ Use **this rule** (`no-shortcut-ref-link`) as a companion when:
 - You want auto-fix from shortcut to collapsed form.
 - MD052 configuration alone is noisy or hard to tune for your content.
 
-## License
+## Notice
 
-[Apache-2.0](LICENSE)
+Licensed under [Apache-2.0](LICENSE). Copyright 2026-present [@chalin][] and
+contributors.
 
+[@chalin]: https://github.com/chalin
 [collapsed]: https://spec.commonmark.org/0.31.2/#collapsed-reference-link
 [markdownlint]: https://github.com/DavidAnson/markdownlint
 [MD052]: https://github.com/DavidAnson/markdownlint/blob/main/doc/md052.md
