@@ -44,7 +44,7 @@ For details, including sample MD052 configuration, see
 From GitHub:
 
 ```sh
-npm install github:chalin/markdownlint-rule-no-shortcut-ref-link#semver:0.3.0 --save-dev
+npm install github:chalin/markdownlint-rule-no-shortcut-ref-link#semver:0.3.1 --save-dev
 ```
 
 ## Usage
@@ -105,6 +105,7 @@ false positives:
 - Content inside raw-content HTML blocks (`<script>`, `<style>`, `<pre>`,
   `<textarea>`) so JS/CSS/textarea/pre bracket syntax is not touched. Shortcut
   refs inside other HTML blocks (e.g. `<div>`) are still flagged and fixed.
+- Bracketed text inside inline HTML `<code>...</code>` tags.
 
 ### 4. Fix violations (optional)
 

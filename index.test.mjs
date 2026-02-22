@@ -364,5 +364,25 @@ describe(ruleName, () => {
           'Some [other-link][] that gets fixed ...\n',
       );
     });
+
+    it('does not flag or modify bracketed JSON inside HTML code tags', () => {
+      const input =
+        '<details>\n' +
+        '  <summary> <code>{"resourceLogs":[{"resource" ...}]}</code> </summary>\n' +
+        '</details>\n' +
+        '\n' +
+        'Some [other-link] that gets fixed ...\n';
+      const errors = lintContent(input);
+      assert.equal(errors.length, 1);
+      const fixed = fixContent(input);
+      assert.equal(
+        fixed,
+        '<details>\n' +
+          '  <summary> <code>{"resourceLogs":[{"resource" ...}]}</code> </summary>\n' +
+          '</details>\n' +
+          '\n' +
+          'Some [other-link][] that gets fixed ...\n',
+      );
+    });
   });
 });

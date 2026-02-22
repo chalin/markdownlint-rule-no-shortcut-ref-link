@@ -30,6 +30,26 @@ function isEmbeddedInIdentifier(line, token) {
   return before && after && identCharRe.test(before) && identCharRe.test(after);
 }
 
+function isInsideHtmlCodeTag(line, token) {
+  const tokenStart = token.startColumn - 1;
+  const tokenEnd = token.endColumn - 1;
+  const openRe = /<code\b[^>]*>/gi;
+  const closeRe = /<\/code>/gi;
+
+  let openMatch;
+  while ((openMatch = openRe.exec(line)) !== null) {
+    const contentStart = openMatch.index + openMatch[0].length;
+    closeRe.lastIndex = contentStart;
+    const closeMatch = closeRe.exec(line);
+    if (!closeMatch) break;
+    const contentEnd = closeMatch.index;
+
+    if (tokenStart >= contentStart && tokenEnd <= contentEnd) return true;
+    openRe.lastIndex = closeMatch.index + closeMatch[0].length;
+  }
+  return false;
+}
+
 function reportShortcut(onError, params, labelText, token, ignoreRe) {
   if (labelText.startsWith('!')) return; // GitHub alert syntax, e.g. [!NOTE]
   if (labelText.startsWith('^')) return; // footnote syntax, e.g. [^1]
@@ -37,6 +57,7 @@ function reportShortcut(onError, params, labelText, token, ignoreRe) {
   if (token.startLine !== token.endLine) return;
 
   const line = params.lines[token.startLine - 1];
+  if (isInsideHtmlCodeTag(line, token)) return;
   if (isEmbeddedInIdentifier(line, token)) return;
   if (line[token.endColumn - 1] === '(') return; // unresolved inline link, e.g. [text]({{...}})
 
