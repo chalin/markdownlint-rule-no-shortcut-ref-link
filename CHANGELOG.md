@@ -8,6 +8,15 @@ and this project adheres to
 
 ## [Unreleased][]
 
+## [v0.4.0][] - 2026-06-15
+
+### Fixed
+
+- Do not flag or modify wiki links (`[[page]]`, `[[page|alias]]`, etc.). A
+  shortcut wrapped in a second pair of brackets is treated as an Obsidian/Foam
+  wiki link and is skipped in both the defined and undefined paths, so the rule
+  is safe to enable with `check_undefined: true` in wiki-link-style content.
+
 ## [v0.3.1][] - 2026-02-22
 
 ### Changed
@@ -32,6 +41,8 @@ and this project adheres to
 - Initial release.
 
 [Unreleased]: #
+[v0.4.0]:
+  https://github.com/chalin/markdownlint-rule-no-shortcut-ref-link/compare/v0.3.1...v0.4.0
 [v0.3.1]:
   https://github.com/chalin/markdownlint-rule-no-shortcut-ref-link/compare/v0.3.0...v0.3.1
 [v0.2.0]:
