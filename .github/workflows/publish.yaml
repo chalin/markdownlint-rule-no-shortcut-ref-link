@@ -1,7 +1,8 @@
 name: publish
 
 # Auth: npm trusted publishing (OIDC) — requires one-time setup on npmjs.com
-# (package Settings > Trusted Publisher: this repo + this workflow).
+# (package Settings > Trusted Publisher: this repo + this workflow + the
+# npm-publish environment).
 
 on:
   release:
@@ -12,6 +13,9 @@ permissions: {}
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # Unprotected for now (single-owner repo); if the repo gains collaborators,
+    # add required reviewers + prevent-self-review to this environment.
+    environment: npm-publish
     permissions:
       contents: read
       id-token: write # OIDC trusted publishing + provenance
