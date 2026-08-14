@@ -1,8 +1,8 @@
 name: publish
 
-# Auth: npm trusted publishing (OIDC). Requires one-time setup on npmjs.com
-# (package Settings > Trusted Publisher: this repo + this workflow + the
-# npm-publish environment).
+# The npm Trusted Publisher registration (package settings on npmjs.com) binds
+# to this repo + this workflow's filename + the npm-publish environment;
+# renaming any of these breaks publishing.
 
 on:
   release:
