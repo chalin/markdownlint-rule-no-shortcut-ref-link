@@ -13,8 +13,6 @@ permissions: {}
 jobs:
   publish:
     runs-on: ubuntu-latest
-    # Unprotected for now (single-owner repo); if the repo gains collaborators,
-    # add required reviewers + prevent-self-review to this environment.
     environment: npm-publish
     permissions:
       contents: read
