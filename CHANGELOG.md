@@ -8,6 +8,12 @@ and this project adheres to
 
 ## [Unreleased][]
 
+## [v0.4.0][] - 2026-08-14
+
+### Added
+
+- Skip wiki links (`[[page]]`, `[[page|alias]]`).
+
 ## [v0.3.1][] - 2026-02-22
 
 ### Changed
@@ -32,6 +38,8 @@ and this project adheres to
 - Initial release.
 
 [Unreleased]: #
+[v0.4.0]:
+  https://github.com/chalin/markdownlint-rule-no-shortcut-ref-link/compare/v0.3.1...v0.4.0
 [v0.3.1]:
   https://github.com/chalin/markdownlint-rule-no-shortcut-ref-link/compare/v0.3.0...v0.3.1
 [v0.2.0]:

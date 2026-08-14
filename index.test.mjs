@@ -292,6 +292,44 @@ describe(ruleName, () => {
     });
   });
 
+  describe('wiki links', () => {
+    it('skips a plain wiki link [[foo]]', () => {
+      const errors = lintContent('See [[foo]] for details.\n');
+      assert.equal(errors.length, 0);
+    });
+
+    it('skips a wiki link even when a matching definition exists', () => {
+      const errors = lintContent(
+        'See [[foo]] for details.\n\n[foo]: https://example.com\n',
+      );
+      assert.equal(errors.length, 0);
+    });
+
+    it('skips an aliased wiki link [[target|alias]]', () => {
+      const errors = lintContent('See [[l10n-team-support|teams]] here.\n');
+      assert.equal(errors.length, 0);
+    });
+
+    it('skips path and heading wiki links', () => {
+      const errors = lintContent(
+        'See [[2026/06/notes]] and [[2026#Quarters]].\n',
+      );
+      assert.equal(errors.length, 0);
+    });
+
+    it('does not modify a wiki link under --fix', () => {
+      const input = 'See [[foo]] and a real [bar] shortcut.\n';
+      const fixed = fixContent(input);
+      assert.equal(fixed, 'See [[foo]] and a real [bar][] shortcut.\n');
+    });
+
+    it('still flags a real shortcut adjacent to a wiki link', () => {
+      const errors = lintContent('See [[foo]] and [bar] here.\n');
+      assert.equal(errors.length, 1);
+      assert.match(errors[0].errorDetail, /\[bar\]/);
+    });
+  });
+
   describe('HTML raw-content blocks', () => {
     it('does not flag or modify JS array syntax inside a script tag', () => {
       const input =

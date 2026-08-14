@@ -1,5 +1,6 @@
 version: '0.2'
 language: en-US
+useGitignore: true
 words:
   - chalin
   - markdownlint

@@ -1,0 +1,36 @@
+name: publish
+
+# Registered npm-side as this repo + filename + environment; renames break
+# publishing.
+
+on:
+  release:
+    types: [published]
+
+permissions: {}
+
+jobs:
+  publish:
+    # A prerelease would land on the default dist-tag.
+    if: ${{ !github.event.release.prerelease }}
+    runs-on: ubuntu-latest
+    environment: npm-publish
+    permissions:
+      contents: read
+      id-token: write # OIDC trusted publishing + provenance
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - name: Check that the release tag matches the package version
+        run: |
+          version=$(node -p 'require("./package.json").version')
+          test "$GITHUB_REF_NAME" = "v$version"
+      # No install or checks: `test` already gates every push, and publishing
+      # needs no node_modules, so no registry-delivered code runs with
+      # id-token authority.
+      # The owner's 2FA approval on npmjs.com is the proof-of-presence OIDC
+      # alone can't provide.
+      - run: npm stage publish --ignore-scripts

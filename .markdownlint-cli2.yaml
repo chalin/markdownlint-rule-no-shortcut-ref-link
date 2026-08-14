@@ -1,6 +1,7 @@
 customRules:
   - ./index.mjs
 
+gitignore: true
 ignores:
   - '**/node_modules/**'
 

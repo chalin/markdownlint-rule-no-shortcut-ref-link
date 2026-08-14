@@ -30,6 +30,18 @@ function isEmbeddedInIdentifier(line, token) {
   return before && after && identCharRe.test(before) && identCharRe.test(after);
 }
 
+// Covers both micromark token shapes for an Obsidian/Foam wiki link
+// (`[[label]]`): the inner `[label]` (wrapped by an extra bracket pair) and
+// the outer `[[label]` wrapper that appears when the inner label happens to
+// resolve to a definition.
+function isWikiLink(line, token) {
+  const before = line[token.startColumn - 2]; // char before '['
+  const after = line[token.endColumn - 1]; // char after ']'
+  if (before === '[' && after === ']') return true;
+  if (line[token.startColumn] === '[') return true;
+  return false;
+}
+
 function isInsideHtmlCodeTag(line, token) {
   const tokenStart = token.startColumn - 1;
   const tokenEnd = token.endColumn - 1;
@@ -58,6 +70,7 @@ function reportShortcut(onError, params, labelText, token, ignoreRe) {
 
   const line = params.lines[token.startLine - 1];
   if (isInsideHtmlCodeTag(line, token)) return;
+  if (isWikiLink(line, token)) return;
   if (isEmbeddedInIdentifier(line, token)) return;
   if (line[token.endColumn - 1] === '(') return; // unresolved inline link, e.g. [text]({{...}})
 

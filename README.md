@@ -17,14 +17,8 @@ An **undefined reference** is a reference link with no matching definition.
 [MD052][] reports undefined references, but it **ignores shortcut syntax** by
 default because bracketed text can be ambiguous.
 
-To catch undefined shortcut references, you can either:
-
-- _Configure MD052_ to report undefined shortcut references. Note that this can
-  be hard to tune for your content.
-- _Use this companion rule_ to auto-convert shortcut refs to the unambiguous
-  collapsed form (`[label][]`), then let MD052 catch missing definitions.
-
-For details, including sample MD052 configuration, see
+Converting shortcuts to collapsed form lets MD052 catch missing definitions. If
+MD052 configuration alone suffices, see
 [MD052 vs this rule](#md052-vs-this-rule).
 
 ## Scope
@@ -41,10 +35,14 @@ For details, including sample MD052 configuration, see
 
 ## Install
 
-From GitHub:
+```sh
+npm install --save-dev markdownlint-rule-no-shortcut-ref-link
+```
+
+Or from GitHub, pinned to a tag:
 
 ```sh
-npm install github:chalin/markdownlint-rule-no-shortcut-ref-link#semver:0.3.1 --save-dev
+npm install --save-dev github:chalin/markdownlint-rule-no-shortcut-ref-link#v0.4.0
 ```
 
 ## Usage
@@ -98,6 +96,7 @@ false positives:
 
 - GitHub alert syntax: `[!NOTE]`, `[!WARNING]`, etc.
 - Footnote references: `[^1]`, `[^note]`, etc.
+- Wiki links (Obsidian/Foam style): `[[page]]`, `[[page|alias]]`, etc.
 - Labels embedded in identifiers: e.g. `otel.[name].enabled`, where both the
   character before `[` and after `]` are alphanumeric or `.`.
 - Unresolved inline links: e.g. `[text]({{...}})`, where `]` is immediately
@@ -112,7 +111,7 @@ false positives:
 Run your linter with the `--fix` flag to auto-convert shortcut references:
 
 ```sh
-npx markdownlint-cli2 --fix '**/*.md'
+npx --no -- markdownlint-cli2 --fix '**/*.md'
 ```
 
 ## MD052 vs this rule
