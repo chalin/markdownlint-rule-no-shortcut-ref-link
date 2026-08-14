@@ -31,6 +31,6 @@ jobs:
       # No install or checks: `test` already gates every push, and publishing
       # needs no node_modules, so no registry-delivered code runs with
       # id-token authority.
-      # The owner approves the staged version on npmjs.com with 2FA:
-      # proof-of-presence that OIDC alone can't provide.
+      # The owner's 2FA approval on npmjs.com is the proof-of-presence OIDC
+      # alone can't provide.
       - run: npm stage publish --ignore-scripts
