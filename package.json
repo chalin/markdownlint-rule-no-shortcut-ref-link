@@ -13,18 +13,18 @@
   "type": "module",
   "exports": "./index.mjs",
   "scripts": {
-    "check:format": "npx prettier --check .",
-    "check:markdown": "npx markdownlint-cli2 \"**/*.md\"",
-    "check:spelling": "npx cspell --no-progress \"**/*.{md,mjs}\"",
+    "check:format": "prettier --check .",
+    "check:markdown": "markdownlint-cli2 \"**/*.md\"",
+    "check:spelling": "cspell --no-progress \"**/*.{md,mjs}\"",
     "check": "npm run check:format && npm run check:markdown && npm run check:spelling",
-    "fix:format": "npx prettier --write .",
+    "fix:format": "prettier --write .",
     "fix:markdown": "npm run check:markdown -- --fix",
     "fix": "npm run fix:format && npm run fix:markdown",
     "test-and-check": "npm run test-only && npm run check",
     "test-and-fix": "npm run fix && npm run test-and-check",
     "test-only": "node --test",
     "test": "npm run test-and-check",
-    "update:packages": "npx npm-check-updates --dep dev,optional -u"
+    "update:packages": "npm-check-updates --dep dev,optional -u"
   },
   "files": [
     "index.mjs",
