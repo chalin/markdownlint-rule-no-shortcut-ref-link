@@ -41,10 +41,14 @@ For details, including sample MD052 configuration, see
 
 ## Install
 
-From GitHub:
+```sh
+npm install --save-dev markdownlint-rule-no-shortcut-ref-link
+```
+
+Or from GitHub, pinned to a tag:
 
 ```sh
-npm install github:chalin/markdownlint-rule-no-shortcut-ref-link#semver:0.3.1 --save-dev
+npm install --save-dev github:chalin/markdownlint-rule-no-shortcut-ref-link#semver:0.4.0
 ```
 
 ## Usage
