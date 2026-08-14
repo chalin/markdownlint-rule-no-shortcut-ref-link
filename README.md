@@ -102,9 +102,7 @@ false positives:
 
 - GitHub alert syntax: `[!NOTE]`, `[!WARNING]`, etc.
 - Footnote references: `[^1]`, `[^note]`, etc.
-- Wiki links: `[[page]]`, `[[page|alias]]`, etc. -- a shortcut wrapped in a
-  second pair of brackets is treated as an Obsidian/Foam-style wiki link and is
-  never flagged or modified.
+- Wiki links (Obsidian/Foam style): `[[page]]`, `[[page|alias]]`, etc.
 - Labels embedded in identifiers: e.g. `otel.[name].enabled`, where both the
   character before `[` and after `]` are alphanumeric or `.`.
 - Unresolved inline links: e.g. `[text]({{...}})`, where `]` is immediately

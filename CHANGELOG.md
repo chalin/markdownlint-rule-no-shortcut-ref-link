@@ -12,7 +12,7 @@ and this project adheres to
 
 ### Fixed
 
-- Do not flag or modify wiki links (`[[page]]`, `[[page|alias]]`, etc.).
+- Do not flag or modify wiki links (`[[page]]`, `[[page|alias]]`).
 
 ## [v0.3.1][] - 2026-02-22
 

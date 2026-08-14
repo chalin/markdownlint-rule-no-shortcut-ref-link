@@ -1,6 +1,6 @@
 name: publish
 
-# Auth: npm trusted publishing (OIDC) -- requires one-time setup on npmjs.com
+# Auth: npm trusted publishing (OIDC). Requires one-time setup on npmjs.com
 # (package Settings > Trusted Publisher: this repo + this workflow + the
 # npm-publish environment).
 
@@ -30,6 +30,6 @@ jobs:
           version=$(node -p 'require("./package.json").version')
           test "$GITHUB_REF_NAME" = "v$version"
       # No install or checks: `test` already gates every push, and publishing
-      # needs no node_modules -- so no registry-delivered code runs with
+      # needs no node_modules, so no registry-delivered code runs with
       # id-token authority.
       - run: npm publish --ignore-scripts
