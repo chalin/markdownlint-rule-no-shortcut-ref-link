@@ -3,6 +3,7 @@ customRules:
 
 ignores:
   - '**/node_modules/**'
+  - tmp/
 
 config:
   extends: .markdownlint.yaml
