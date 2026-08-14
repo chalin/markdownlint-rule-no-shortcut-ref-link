@@ -10,9 +10,9 @@ and this project adheres to
 
 ## [v0.4.0][] - 2026-08-14
 
-### Fixed
+### Added
 
-- Do not flag or modify wiki links (`[[page]]`, `[[page|alias]]`).
+- Skip wiki links (`[[page]]`, `[[page|alias]]`).
 
 ## [v0.3.1][] - 2026-02-22
 
