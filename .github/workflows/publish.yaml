@@ -11,7 +11,7 @@ permissions: {}
 
 jobs:
   publish:
-    # Stable releases only; a prerelease would land on the default dist-tag.
+    # A prerelease would land on the default dist-tag.
     if: ${{ !github.event.release.prerelease }}
     runs-on: ubuntu-latest
     environment: npm-publish
@@ -31,6 +31,6 @@ jobs:
       # No install or checks: `test` already gates every push, and publishing
       # needs no node_modules, so no registry-delivered code runs with
       # id-token authority.
-      # Stage only: the owner approves the staged version on npmjs.com with
-      # 2FA -- the proof-of-presence step OIDC alone can't provide.
+      # The owner approves the staged version on npmjs.com with 2FA:
+      # proof-of-presence that OIDC alone can't provide.
       - run: npm stage publish --ignore-scripts
