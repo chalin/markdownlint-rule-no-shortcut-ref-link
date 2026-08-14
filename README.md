@@ -17,9 +17,9 @@ An **undefined reference** is a reference link with no matching definition.
 [MD052][] reports undefined references, but it **ignores shortcut syntax** by
 default because bracketed text can be ambiguous.
 
-This rule auto-converts shortcut refs to the unambiguous collapsed form
-(`[label][]`), letting MD052 catch missing definitions. For when MD052
-configuration alone suffices, see [MD052 vs this rule](#md052-vs-this-rule).
+This rule flags shortcut refs and can auto-convert them to collapsed form
+(`[label][]`), so MD052 can catch missing definitions. If MD052 configuration
+alone suffices, see [MD052 vs this rule](#md052-vs-this-rule).
 
 ## Scope
 
