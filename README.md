@@ -117,7 +117,7 @@ false positives:
 Run your linter with the `--fix` flag to auto-convert shortcut references:
 
 ```sh
-npx markdownlint-cli2 --fix '**/*.md'
+npx --no -- markdownlint-cli2 --fix '**/*.md'
 ```
 
 ## MD052 vs this rule
