@@ -48,7 +48,7 @@ npm install --save-dev markdownlint-rule-no-shortcut-ref-link
 Or from GitHub, pinned to a tag:
 
 ```sh
-npm install --save-dev github:chalin/markdownlint-rule-no-shortcut-ref-link#semver:0.4.0
+npm install --save-dev github:chalin/markdownlint-rule-no-shortcut-ref-link#v0.4.0
 ```
 
 ## Usage
@@ -102,7 +102,7 @@ false positives:
 
 - GitHub alert syntax: `[!NOTE]`, `[!WARNING]`, etc.
 - Footnote references: `[^1]`, `[^note]`, etc.
-- Wiki links: `[[page]]`, `[[page|alias]]`, etc. — a shortcut wrapped in a
+- Wiki links: `[[page]]`, `[[page|alias]]`, etc. -- a shortcut wrapped in a
   second pair of brackets is treated as an Obsidian/Foam-style wiki link and is
   never flagged or modified.
 - Labels embedded in identifiers: e.g. `otel.[name].enabled`, where both the

@@ -12,10 +12,7 @@ and this project adheres to
 
 ### Fixed
 
-- Do not flag or modify wiki links (`[[page]]`, `[[page|alias]]`, etc.). A
-  shortcut wrapped in a second pair of brackets is treated as an Obsidian/Foam
-  wiki link and is skipped in both the defined and undefined paths, so the rule
-  is safe to enable with `check_undefined: true` in wiki-link-style content.
+- Do not flag or modify wiki links (`[[page]]`, `[[page|alias]]`, etc.).
 
 ## [v0.3.1][] - 2026-02-22
 

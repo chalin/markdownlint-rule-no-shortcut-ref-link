@@ -30,7 +30,7 @@ function isEmbeddedInIdentifier(line, token) {
   return before && after && identCharRe.test(before) && identCharRe.test(after);
 }
 
-// A shortcut wrapped in a second pair of brackets — `[[label]]` — is a wiki
+// A shortcut wrapped in a second pair of brackets -- `[[label]]` -- is a wiki
 // link (Obsidian/Foam style), not a shortcut reference link, so skip it. This
 // covers both micromark token shapes: the inner `[label]` (wrapped by an extra
 // bracket pair) and the outer `[[label]` wrapper that appears when the inner
