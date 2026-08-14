@@ -1,8 +1,7 @@
 name: publish
 
-# The npm Trusted Publisher registration (package settings on npmjs.com) binds
-# to this repo + this workflow's filename + the npm-publish environment;
-# renaming any of these breaks publishing.
+# Registered npm-side as this repo + filename + environment; renames break
+# publishing.
 
 on:
   release:
